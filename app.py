@@ -36,7 +36,6 @@ def preprocess_image(filepath):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # Check if file part is present
         if 'file' not in request.files:
             return render_template('index.html', error="No file part")
 
@@ -49,7 +48,6 @@ def index():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
 
-            # Process image and predict
             features = preprocess_image(filepath)
             prediction = model.predict([features])[0]
             probability = model.predict_proba([features])[0][prediction]
@@ -66,6 +64,8 @@ def index():
 def uploaded_file(filename):
     return os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
+# --- Entry Point ---
 if __name__ == '__main__':
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
